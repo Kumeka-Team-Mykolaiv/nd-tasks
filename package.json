@@ -1,0 +1,19 @@
+{
+  "name": "nd-tasks",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@fastify/cors": "^11.0.1",
+    "dotenv": "^16.4.7",
+    "fastify": "^5.2.2",
+    "googleapis": "^148.0.0"
+  }
+}
