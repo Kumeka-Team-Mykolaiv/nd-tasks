@@ -11,7 +11,7 @@ const oauth2Client = new google.auth.OAuth2(
 );
 
 // URL для отримання авторизації
-const SCOPES = ['https://www.googleapis.com/auth/tasks.readonly'];
+const SCOPES = ['https://www.googleapis.com/auth/tasks.readonly',  'https://www.googleapis.com/auth/userinfo.profile' ];
 
 // Підготовка Fastify для відправки запитів
 fastify.get('/', (request, reply) => {
@@ -37,6 +37,15 @@ async function getTaskLists(code) {
         const { tokens } = await oauth2Client.getToken(code);
         oauth2Client.setCredentials(tokens);
 
+        const people = google.people({ version: 'v1', auth: oauth2Client });
+        const userInfo = await people.people.get({
+            resourceName: 'people/me',
+            personFields: 'names,photos',
+        });
+        
+        // Отримуємо ID користувача
+        const userId = userInfo.data.resourceName.split('/')[1];
+
         const tasks = google.tasks({ version: 'v1', auth: oauth2Client });
         const res = await tasks.tasklists.list();
         const tasklists = res.data.items;
@@ -44,8 +53,9 @@ async function getTaskLists(code) {
         if (!tasklists || tasklists.length === 0) {
             throw new Error('Немає списків задач.');
         }
+        
 
-        return tasklists;
+        return { userId, tasklists };;
     } catch (error) {
         console.error(error);
         throw new Error('Сталася помилка під час отримання даних.');
@@ -55,11 +65,12 @@ async function getTaskLists(code) {
 // Маршрут для callback після авторизації
 fastify.get('/callback', async (request, reply) => {
     try {
-        const tasklists = await getTaskLists(request.query.code);
+        const { userId, tasklists } = await getTaskLists(request.query.code);
         
-        let tasklistHtml = '<h1>Ваші списки задач</h1><ul>';
+        let tasklistHtml = `<h2> задачі для користувача: ${userId}</h2>`;
+        tasklistHtml += '<h3>Ваші списки задач</h3><ul>';
         tasklists.forEach(tasklist => {
-            tasklistHtml += `<li>${tasklist.title}</li>`;
+            tasklistHtml += `<li>ID: ${tasklist.id} - ${tasklist.title}</li>`;
         });
         tasklistHtml += '</ul>';
 
