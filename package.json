@@ -16,5 +16,8 @@
     "dotenv": "^16.4.7",
     "fastify": "^5.2.2",
     "googleapis": "^148.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
   }
 }
