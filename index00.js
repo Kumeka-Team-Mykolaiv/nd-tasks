@@ -67,9 +67,10 @@ fastify.get('/callback', async (request, reply) => {
 // Запуск сервера з async/await
 const start = async () => {
     try {
+        const HOST = '0.0.0.0';
         const port = process.env.PORT || 3000;
-        await fastify.listen({ port: port });
-        console.log('Сервер запущено на http://localhost:3000');
+        await fastify.listen(port, HOST); //{ port: port, host: HOST }
+        console.log('Сервер запущено на http://localhost:' + port);
     } catch (err) {
         console.error(err);
         process.exit(1);
